@@ -14,6 +14,8 @@ MongoClient.connect('mongodb://test1:a12345@ds117859.mlab.com:17859/star-wars-qu
 
 app.use(bodyParser.urlencoded({extended: true}))
 app.set('view engine', 'ejs')
+app.use(express.static('public'))
+app.use(bodyParser.json())
 
 // app.get('/', (req, res) => {
 //  res.sendFile(__dirname + '/index.html')
@@ -37,3 +39,19 @@ app.get('/', (req, res) => {
 	console.log(results)
 	})
 })
+
+app.put('/quotes', (req, res) => {
+	db.collection('quotes').findOneAndUpdate(
+		{name: 'Yoda'}, 
+		{$set: {
+			name: req.body.name,
+			quote: req.body.quote
+		}},
+		{sort: {_id: -1},
+		upsert: true
+		}, (err, result) => {
+			if (err) return res.send(err)
+			res.send(result)
+		})
+})
+
